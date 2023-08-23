@@ -19,7 +19,7 @@ ON DELETE SET NULL
 );
 
 CREATE TABLE employee (
-employee_id INT AUTO_INCREMENT PRIMARY KEY,
+id INT AUTO_INCREMENT PRIMARY KEY,
 first_name VARCHAR(30),
 last_name VARCHAR(30),
 role_id INT,

@@ -1,11 +1,11 @@
 const inquirer = require("inquirer");
-const mysql = require("mysq2");
+const mysql = require("mysql2");
 
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "password",
-  database: "employee_db",
+  password: "",
+  database: "employees_db",
 });
 
 mainM();
@@ -85,13 +85,17 @@ function addEmployee() {
       },
     ])
     .then(function (answer) {
+      var manager;
+      if ((answer.managerId = "")) {
+        manager = null;
+      }
       db.query(
         "INSERT INTO employee SET ?",
         {
           first_name: answer.firstName,
           last_name: answer.lastName,
           role_id: answer.roleId,
-          manager_id: answer.managerId,
+          manager_id: manager,
         },
         function (err) {
           if (err) throw err;
@@ -137,10 +141,14 @@ function updateRole() {
 }
 
 function viewRoles() {
-  db.query("SELECT * FROM role", function (err, results) {
-    console.table(results);
-    mainM();
-  });
+  db.query(
+    // department. is being defind on the LEFT JOIN, department_id has to match the department.id.
+    "SELECT role.id, role.title, role.salary, department.department_name AS department FROM role LEFT JOIN department ON department_id = department.id",
+    function (err, results) {
+      console.table(results);
+      mainM();
+    }
+  );
 }
 
 function addRole() {
@@ -189,6 +197,7 @@ function viewDepartments() {
 function addDepartment() {
   inquirer
     .prompt([
+      // asls questions by prompting user
       {
         type: "input",
         name: "departmentName",
@@ -196,10 +205,11 @@ function addDepartment() {
       },
     ])
     .then(function (answer) {
+      // grab the function and pass in the asnwer to the variable called asnwer
       db.query(
-        "INSERT INTO department SET ?",
+        "INSERT INTO department SET ?", // set name of department
         {
-          name: answer.departmentName,
+          department_name: answer.departmentName,
         },
         function (err) {
           if (err) throw err;
